@@ -100,26 +100,6 @@ The application will be available at `http://127.0.0.1:8000/`
 ### SQLite (Default)
 The application uses SQLite by default, which requires no additional setup.
 
-### MySQL
-To use MySQL, update the database settings in `suggestion_box/settings.py`:
-
-```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'digital_suggestion_box',
-        'USER': 'your_username',
-        'PASSWORD': 'your_password',
-        'HOST': 'localhost',
-        'PORT': '3306',
-    }
-}
-```
-
-Install MySQL client:
-```bash
-pip install mysqlclient
-```
 
 ## Project Structure
 
