@@ -1,0 +1,109 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Home - Digital Suggestion Box{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    {% if user.is_authenticated %}
+        <!-- Suggestion Form for logged-in users -->
+        <div class="max-w-xl mx-auto bg-white rounded-lg shadow-md p-8">
+            <h2 class="text-2xl font-bold text-blue-600 mb-6">Submit Your Suggestion</h2>
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-medium py-2 px-6 rounded-md transition duration-200">Submit</button>
+            </form>
+        </div>
+        {% if messages %}
+            <div class="max-w-xl mx-auto mt-6">
+                {% for message in messages %}
+                    <div class="mb-4 p-4 rounded-md {% if message.tags == 'error' %}bg-red-100 border border-red-400 text-red-700{% else %}bg-green-100 border border-green-400 text-green-700{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+                <a href="{% url 'home' %}" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-md text-sm font-medium mt-2 inline-block">
+                    Submit Another Suggestion
+                </a>
+            </div>
+        {% endif %}
+    {% else %}
+        <!-- Modern Hero Section for Guests (Light Mode) -->
+        <div class="min-h-[80vh] flex flex-col justify-center items-center py-16 px-4">
+            <div class="max-w-2xl w-full text-center">
+                <div class="flex justify-center mb-6">
+                    <svg class="w-20 h-20 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 48 48">
+                        <circle cx="24" cy="24" r="22" stroke="#2563eb" stroke-width="3" fill="#e0e7ef"/>
+                        <path d="M16 24h16M16 30h8" stroke="#2563eb" stroke-width="3" stroke-linecap="round"/>
+                        <path d="M24 14v2" stroke="#2563eb" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
+                </div>
+                <h1 class="text-5xl font-extrabold text-gray-900 mb-4">Welcome to Digital Suggestion Box</h1>
+                <p class="text-xl text-gray-700 mb-8">Share your ideas and suggestions to help improve our campus community. Your voice matters!</p>
+                <div class="flex justify-center gap-6 mb-12 flex-wrap">
+                    <a href="{% url 'login' %}" class="bg-blue-600 hover:bg-blue-500 text-white px-8 py-3 rounded-lg text-lg font-semibold shadow transition">Login</a>
+                    <a href="{% url 'register' %}" class="bg-white border border-blue-600 text-blue-600 hover:bg-blue-50 px-8 py-3 rounded-lg text-lg font-semibold shadow transition">Register</a>
+                </div>
+                <!-- Feature Highlights -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+                    <div class="flex flex-col items-center bg-white rounded-lg p-6 shadow">
+                        <svg class="w-10 h-10 mb-2 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 20l9-5-9-5-9 5 9 5z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 12V4l9 5-9 5-9-5 9-5z" />
+                        </svg>
+                        <h3 class="font-bold text-lg text-gray-900 mb-1">Anonymous Feedback</h3>
+                        <p class="text-gray-600 text-sm">Submit suggestions without revealing your identity.</p>
+                    </div>
+                    <div class="flex flex-col items-center bg-white rounded-lg p-6 shadow">
+                        <svg class="w-10 h-10 mb-2 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2a4 4 0 018 0v2" />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg>
+                        <h3 class="font-bold text-lg text-gray-900 mb-1">Admin Review</h3>
+                        <p class="text-gray-600 text-sm">All suggestions are reviewed by campus administrators.</p>
+                    </div>
+                    <div class="flex flex-col items-center bg-white rounded-lg p-6 shadow">
+                        <svg class="w-10 h-10 mb-2 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <h3 class="font-bold text-lg text-gray-900 mb-1">Campus Improvement</h3>
+                        <p class="text-gray-600 text-sm">Help make our campus a better place for everyone.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Features Section -->
+    <div class="mt-16 grid md:grid-cols-3 gap-8">
+        <div class="text-center">
+            <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Easy Submission</h3>
+            <p class="text-gray-600">Submit your suggestions quickly and easily through our user-friendly interface.</p>
+        </div>
+
+        <div class="text-center">
+            <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Track Progress</h3>
+            <p class="text-gray-600">Monitor the status of your suggestions and receive updates on their progress.</p>
+        </div>
+
+        <div class="text-center">
+            <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Community Driven</h3>
+            <p class="text-gray-600">Help shape the future of our campus by contributing your valuable ideas.</p>
+        </div>
+    </div>
+</div>
+{% endblock %} 

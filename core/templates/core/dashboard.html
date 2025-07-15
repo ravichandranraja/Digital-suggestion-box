@@ -1,0 +1,260 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Dashboard - Digital Suggestion Box{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">
+            {% if user.is_staff %}
+                Admin Dashboard
+            {% else %}
+                My Suggestions
+            {% endif %}
+        </h1>
+        <p class="text-gray-600 mt-2">
+            {% if user.is_staff %}
+                Manage all suggestions and categories
+            {% else %}
+                Track the status of your submitted suggestions
+            {% endif %}
+        </p>
+        <a href="{% url 'home' %}" class="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium mt-4 inline-block">
+            Submit Another Suggestion
+        </a>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Total Suggestions</p>
+                    <p class="text-2xl font-semibold text-gray-900">{{ total_count }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-yellow-100 text-yellow-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Under Review</p>
+                    <p class="text-2xl font-semibold text-gray-900" data-count-status="under_review">{{ under_review_count }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-green-100 text-green-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Accepted</p>
+                    <p class="text-2xl font-semibold text-gray-900" data-count-status="accepted">{{ accepted_count }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center">
+                <div class="p-3 rounded-full bg-red-100 text-red-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </div>
+                <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-600">Rejected</p>
+                    <p class="text-2xl font-semibold text-gray-900" data-count-status="rejected">{{ rejected_count }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Suggestions List -->
+    <div class="bg-white rounded-lg shadow-md">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-bold text-gray-900">
+                {% if user.is_staff %}
+                    All Suggestions
+                {% else %}
+                    My Suggestions
+                {% endif %}
+            </h2>
+        </div>
+        
+        {% if suggestions %}
+            <div class="divide-y divide-gray-100">
+                {% for suggestion in suggestions %}
+                <div class="px-6 py-4 hover:bg-gray-50">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-3">
+                                <h3 class="text-lg font-bold text-gray-900">
+                                    <a href="{% url 'suggestion_detail' suggestion.id %}" class="hover:text-primary">
+                                        {{ suggestion.title }}
+                                    </a>
+                                </h3>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                    {% if suggestion.status == 'under_review' %}bg-yellow-100 text-yellow-800
+                                    {% elif suggestion.status == 'accepted' %}bg-green-100 text-green-800
+                                    {% else %}bg-red-100 text-red-800{% endif %}">
+                                    {{ suggestion.get_status_display }}
+                                </span>
+                            </div>
+                            <p class="text-sm text-gray-700 mt-1">{{ suggestion.content|truncatewords:30 }}</p>
+                            <div class="flex items-center space-x-4 mt-2 text-sm text-gray-500">
+                                <span>Category: {{ suggestion.category.name }}</span>
+                                <span>Submitted: {{ suggestion.created_at|date:"M d, Y" }}</span>
+                                {% if suggestion.is_anonymous %}
+                                    <span class="text-gray-400">Anonymous</span>
+                                {% else %}
+                                    <span>By: {{ suggestion.user.username }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        {% if user.is_staff %}
+                        <div class="flex items-center space-x-2">
+                            <select class="status-select text-sm border border-gray-300 rounded px-2 py-1" 
+                                    data-suggestion-id="{{ suggestion.id }}" 
+                                    data-current-status="{{ suggestion.status }}">
+                                <option value="under_review" {% if suggestion.status == 'under_review' %}selected{% endif %}>
+                                    Under Review
+                                </option>
+                                <option value="accepted" {% if suggestion.status == 'accepted' %}selected{% endif %}>
+                                    Accepted
+                                </option>
+                                <option value="rejected" {% if suggestion.status == 'rejected' %}selected{% endif %}>
+                                    Rejected
+                                </option>
+                            </select>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="px-6 py-12 text-center">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">No suggestions</h3>
+                <p class="mt-1 text-sm text-gray-500">
+                    {% if user.is_staff %}
+                        No suggestions have been submitted yet.
+                    {% else %}
+                        You haven't submitted any suggestions yet.
+                    {% endif %}
+                </p>
+                <div class="mt-6">
+                    <a href="{% url 'home' %}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-blue-700">
+                        Submit a suggestion
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const statusSelects = document.querySelectorAll('.status-select');
+    
+    statusSelects.forEach(select => {
+        select.addEventListener('change', function() {
+            const suggestionId = this.dataset.suggestionId;
+            const newStatus = this.value;
+            const oldStatus = this.getAttribute('data-current-status');
+            
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        // Does this cookie string begin with the name we want?
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+            const csrftoken = getCookie('csrftoken');
+
+            fetch(`/update-status/${suggestionId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrftoken
+                },
+                body: `status=${newStatus}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update the status badge
+                    const statusBadge = this.closest('.flex').querySelector('.inline-flex');
+                    statusBadge.textContent = this.options[this.selectedIndex].text;
+                    statusBadge.className = `inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        newStatus === 'under_review' ? 'bg-yellow-100 text-yellow-800' :
+                        newStatus === 'accepted' ? 'bg-green-100 text-green-800' :
+                        'bg-red-100 text-red-800'
+                    }`;
+
+                    // Update the counts in the dashboard
+                    updateStatusCounts(oldStatus, newStatus);
+
+                    // Update the data-current-status attribute
+                    this.setAttribute('data-current-status', newStatus);
+
+                    // Fallback: reload the page to ensure everything is updated
+                    location.reload();
+                } else {
+                    // alert('Failed to update status: ' + (data.error || 'Unknown error'));
+                    // Optionally, show a subtle inline message or do nothing
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // alert('Failed to update status (network or server error)');
+                // Optionally, show a subtle inline message or do nothing
+            });
+        });
+    });
+
+    function updateStatusCounts(oldStatus, newStatus) {
+        if (oldStatus === newStatus) return;
+        const statusMap = {
+            'under_review': document.querySelector('[data-count-status="under_review"]'),
+            'accepted': document.querySelector('[data-count-status="accepted"]'),
+            'rejected': document.querySelector('[data-count-status="rejected"]'),
+        };
+        if (statusMap[oldStatus]) {
+            let oldVal = parseInt(statusMap[oldStatus].textContent, 10);
+            statusMap[oldStatus].textContent = Math.max(0, oldVal - 1);
+        }
+        if (statusMap[newStatus]) {
+            let newVal = parseInt(statusMap[newStatus].textContent, 10);
+            statusMap[newStatus].textContent = newVal + 1;
+        }
+    }
+});
+</script>
+{% endblock %} 
